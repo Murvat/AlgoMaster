@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme static {
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: "Cascadia Code", Consolas, ui-monospace, monospace;
+  --color-canvas: #080b10;
+  --color-toolbar: #0a0e14;
+  --color-sidebar: #0d1118;
+  --color-panel: #111720;
+  --color-code: #080c11;
+  --color-divider: #273242;
+  --color-grid-dot: #314050;
+  --color-foreground: #eef5f7;
+  --color-muted: #8f9dab;
+  --color-accent: #34d399;
+  --color-on-accent: #06120e;
+  --color-hover: #151d27;
+  --color-selected: #16221f;
+  --color-accent-surface: #16372f;
+  --color-info: #60a5fa;
+  --color-warning: #fbbf24;
+  --color-danger: #fb7185;
+  --radius-control: 0.5625rem;
+  --radius-panel: 0.875rem;
+}
+
+.ide-panel {
+  position: absolute;
+  inset-block: 0;
+  z-index: 10;
+  flex: none;
+  overflow: auto;
+}
+
+.ide-workspace {
+  background-image: radial-gradient(var(--color-grid-dot) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+@media (min-width: 768px) {
+  .ide-panel {
+    position: static;
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-canvas);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+}

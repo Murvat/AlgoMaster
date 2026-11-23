@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { librarySelected, type Library } from '../features/catalog/catalogSlice';
 import type { AppDispatch, RootState } from './store';
+import { CodeEditor } from '../features/editor/CodeEditor';
 
 const libraries = [
   { id: 'algorithms', label: 'Algorithms', icon: 'M8 6 2 12l6 6m8-12 6 6-6 6m-2-14-4 16' },
@@ -29,17 +30,20 @@ export function App() {
   const [libraryOpen, setLibraryOpen] = useState(() =>
     window.matchMedia(desktopLayout).matches,
   );
-  const [outlineOpen, setOutlineOpen] = useState(false);
+  const [editorOpen, setEditorOpen] = useState(() =>
+    window.matchMedia(desktopLayout).matches,
+  );
+  const [editorWide, setEditorWide] = useState(false);
   const library = libraries.find(({ id }) => id === activeLibrary) ?? libraries[0];
 
   function toggleLibrary(id: Library) {
     setLibraryOpen(!libraryOpen || id !== activeLibrary);
     dispatch(librarySelected(id));
-    if (!window.matchMedia(desktopLayout).matches) setOutlineOpen(false);
+    if (!window.matchMedia(desktopLayout).matches) setEditorOpen(false);
   }
 
-  function toggleOutline() {
-    setOutlineOpen(!outlineOpen);
+  function toggleEditor() {
+    setEditorOpen(!editorOpen);
     if (!window.matchMedia(desktopLayout).matches) setLibraryOpen(false);
   }
 
@@ -74,22 +78,21 @@ export function App() {
         </aside>
 
         <main aria-label="Study workspace" tabIndex={0} className="ide-workspace min-w-0 flex-1 overflow-auto focus-visible:-outline-offset-3">
-          <div className="mx-auto max-w-5xl px-6 py-10 sm:px-10 sm:py-14">
+          <div className="mx-auto flex min-h-full max-w-5xl flex-col px-3 py-6 sm:px-8 sm:py-10">
             <p className="font-mono text-xs font-bold tracking-widest text-accent uppercase">{library.label}</p>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-5xl">Study workspace</h2>
+            <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-4xl">Study workspace</h2>
           </div>
         </main>
 
-        <aside id="outline-panel" aria-labelledby="outline-heading" hidden={!outlineOpen}
-          className="ide-panel right-12 w-[min(15rem,calc(100%-6rem))] border-l border-divider bg-sidebar p-5 sm:right-14 sm:w-52">
-          <h2 id="outline-heading" className="font-mono text-xs font-bold tracking-widest text-accent uppercase">Outline</h2>
-          <p className="mt-2 text-sm text-muted">No study item selected.</p>
+        <aside id="editor-panel" aria-label="Code editor sidebar" hidden={!editorOpen}
+          data-wide={editorWide} className="ide-panel ide-editor-panel right-12 border-l border-divider bg-code sm:right-14">
+          <CodeEditor wide={editorWide} onToggleWidth={() => setEditorWide((wide) => !wide)} />
         </aside>
 
         <div role="group" aria-label="Workspace panels" className="z-20 flex w-12 shrink-0 justify-center border-l border-divider bg-toolbar py-3 sm:w-14">
-          <button type="button" className={railButton} title="Outline" aria-label="Outline"
-            aria-controls="outline-panel" aria-expanded={outlineOpen} onClick={toggleOutline}>
-            <RailIcon path="M4 4h16v16H4zM14 4v16M7 8h4m-4 4h4m-4 4h4" />
+          <button type="button" className={railButton} title="Code editor" aria-label="Code editor"
+            aria-controls="editor-panel" aria-expanded={editorOpen} onClick={toggleEditor}>
+            <RailIcon path="M8 6 2 12l6 6m8-12 6 6-6 6m-2-14-4 16" />
           </button>
         </div>
       </div>

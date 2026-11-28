@@ -23,12 +23,22 @@ function highlight(code: string) {
 export function CodeEditor({ wide, onToggleWidth }: { wide: boolean; onToggleWidth: () => void }) {
   const [code, setCode] = useState('');
   const [caret, setCaret] = useState(0);
+  const [copyFeedback, setCopyFeedback] = useState('');
   const highlightLayer = useRef<HTMLPreElement>(null);
   const gutter = useRef<HTMLDivElement>(null);
   const lines = code.split('\n');
   const beforeCaret = code.slice(0, caret);
   const line = beforeCaret.split('\n').length;
   const column = beforeCaret.length - beforeCaret.lastIndexOf('\n');
+
+  async function copyCode() {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopyFeedback('Code copied');
+    } catch {
+      setCopyFeedback('Could not copy code');
+    }
+  }
 
   function insertIndentedLine(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key !== 'Enter' || event.nativeEvent.isComposing || event.ctrlKey || event.metaKey || event.altKey) return;
@@ -51,10 +61,16 @@ export function CodeEditor({ wide, onToggleWidth }: { wide: boolean; onToggleWid
     <section aria-label="Code editor" className="flex h-full min-h-40 flex-col overflow-hidden bg-code">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-divider bg-toolbar px-3 py-2 font-mono text-xs text-muted">
         <h2 className="font-semibold text-foreground">Scratchpad</h2>
-        <button type="button" onClick={onToggleWidth}
-          className="rounded-control px-2 py-1 text-accent hover:bg-hover">
-          {wide ? 'Narrow' : 'Expand'}
-        </button>
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={copyCode}
+            className="rounded-control px-2 py-1 text-accent hover:bg-hover">
+            Copy
+          </button>
+          <button type="button" onClick={onToggleWidth}
+            className="rounded-control px-2 py-1 text-accent hover:bg-hover">
+            {wide ? 'Narrow' : 'Expand'}
+          </button>
+        </div>
       </div>
       <div className="flex min-h-0 flex-1">
         <div ref={gutter} aria-hidden="true" className="editor-gutter shrink-0 overflow-hidden border-r border-divider bg-toolbar px-3 text-right font-mono text-muted">
@@ -89,8 +105,9 @@ export function CodeEditor({ wide, onToggleWidth }: { wide: boolean; onToggleWid
           />
         </div>
       </div>
-      <div className="border-t border-divider bg-toolbar px-4 py-2 text-right font-mono text-xs text-muted">
-        Ln {line}, Col {column}
+      <div className="flex flex-wrap justify-between gap-x-2 border-t border-divider bg-toolbar px-4 py-2 font-mono text-xs text-muted">
+        <span role="status">{copyFeedback}</span>
+        <span className="ml-auto">Ln {line}, Col {column}</span>
       </div>
     </section>
   );
